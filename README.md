@@ -9,7 +9,8 @@
 
 First of all you need to clone the RIOT OS in the root directory of this repo, and check a particular release:
 
-``` git clone https://github.com/RIOT-OS/RIOT
+``` 
+  git clone https://github.com/RIOT-OS/RIOT
   cd RIOT
   git checkout RIOT-2016.10
   cd ..
