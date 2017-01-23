@@ -1,7 +1,5 @@
-git clone https://github.com/RIOT-OS/RIOT
-cd RIOT
-git checkout RIOT-2016.10
-cd ..
+git clone --branch 2016.10  https://github.com/RIOT-OS/RIOT
+
 
 #make 
 #make PART=server
