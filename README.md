@@ -1,8 +1,7 @@
 #IOTP-RIOT IoT friendly (One Time Password OTP) on RIOT OS
 
 
-
-
+This is code for research purposes (such as performance measurements, etc). However, this is not meant to be used in production environments.
 
 
 # Setup
