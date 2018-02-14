@@ -32,6 +32,20 @@ void printHex(uint8_t *hex, int offset) {
 	printf("\n");
 }
 
+void writeHex(unsigned char *hex, int offset, char *output) {
+	int j = 0;
+	for (int i = 0; i < 16; ++i) {
+		if (offset > 0 && i >= offset) {
+			break;
+		} else {
+			char tmp[2];
+			sprintf(tmp, "%02x", hex[i]);
+			memcpy(&output[j], tmp, 2);
+			j += 2;
+		}
+	}
+}
+
 uint8_t *parseIk(char *ikString) {
 	uint8_t ik[16] = { 0 };
 	char subString[3];

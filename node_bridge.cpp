@@ -4,7 +4,7 @@
 
 extern "C" {
 int generateEID(char *ikString, int scaler, int beacon_time_seconds, unsigned char *eid);
-void printHex(unsigned char *eid, int offset);
+void writeHex(uint8_t *hex, int offset, char *output);
 }
 
 using v8::Exception;
@@ -39,9 +39,10 @@ void generateEID(const FunctionCallbackInfo<Value>& args) {
 	int scaler = args[1]->NumberValue();
 	int beacon_time_seconds = args[2]->NumberValue();
 
-	unsigned char eid[128];
+	unsigned char eid[17];
 	generateEID(ik, scaler, beacon_time_seconds, eid);
-	printHex(eid, 8);
+	char out[17] = {0};
+	writeHex(eid, 8, out);
 	return;
 }
 
