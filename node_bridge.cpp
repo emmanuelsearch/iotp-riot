@@ -3,9 +3,8 @@
 #include <math.h>
 
 extern "C" {
-int generateEID(char *ikString, int scaler, int beacon_time_seconds,
-		uint8_t *eid);
-void printHex(uint8_t eid, int offset);
+int generateEID(char *ikString, int scaler, int beacon_time_seconds, unsigned char *eid);
+void printHex(unsigned char *eid, int offset);
 }
 
 using v8::Exception;
@@ -40,8 +39,8 @@ void generateEID(const FunctionCallbackInfo<Value>& args) {
 	int scaler = args[1]->NumberValue();
 	int beacon_time_seconds = args[2]->NumberValue();
 
-	uint8_t eid = {0};
-	generateEID(ik, scaler, beacon_time_seconds, &eid);
+	unsigned char eid[128];
+	generateEID(ik, scaler, beacon_time_seconds, eid);
 	printHex(eid, 8);
 	return;
 }

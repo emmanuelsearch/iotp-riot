@@ -55,8 +55,7 @@ uint8_t *parseIk(char *ikString) {
 	return result;
 }
 
-int generateEID(char *ikString, int scaler, int beacon_time_seconds,
-		uint8_t *eid) {
+int generateEID(char *ikString, int scaler, int beacon_time_seconds, unsigned char *eid) {
 
 	uint8_t *ik = parseIk(ikString);
 	printf("Init Key Data: ");
