@@ -8,20 +8,36 @@
 #include <stdio.h>
 #include "eid.h"
 
+#include <string.h>
+#include "shell.h"
 
-int main (int argc, char **argv) {
-	(void) argc;
-	(void) argv;
+int genEID(int argc, char **argv)
+{
+    (void) argc;
+    if(argc > 3) {
+      char *ikString = argv[1];
+      int scaler = atoi(argv[2]);
+      int beacon_time_seconds = atoi(argv[3]);
 
-	char *ikString = "e2e12c2281cdf3d350a34de4d5f56613";
+      uint8_t eid[16] = {0};
+      generateEID(ikString, scaler, beacon_time_seconds, eid);
+      printf("Generated EID: ");
+      printHex(eid, 8);
+    } else {
+       printf("Too few arguments\n");
+    }
+    return 0;
+}
 
-	int scaler = 0;
-	int beacon_time_seconds = 2352222;
+static const shell_command_t commands[] = {
+        { "geneid", "Generates an EID", genEID },
+        { NULL, NULL, NULL }
+};
 
-	uint8_t eid[16] = {0};
-	generateEID(ikString, scaler, beacon_time_seconds, eid);
-	printf("Generated EID: ");
-	printHex(eid, 8);
-	return 0;
+
+int main (void) {
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+    return 0;
 }
 

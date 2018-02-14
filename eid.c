@@ -35,7 +35,7 @@ void printHex(uint8_t *hex, int offset) {
 uint8_t *parseIk(char *ikString) {
 	uint8_t ik[16] = {0};
 	char subString[3];
-	subString[3] = '\0';
+	subString[2] = '\0';
 	int j = 0;
 	for(int i = 0; i < 16*2; i+=2) {
 		memcpy(subString, &ikString[i], 2);
