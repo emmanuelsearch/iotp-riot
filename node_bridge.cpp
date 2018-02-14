@@ -43,6 +43,9 @@ void generateEID(const FunctionCallbackInfo<Value>& args) {
 	generateEID(ik, scaler, beacon_time_seconds, eid);
 	char out[17] = {0};
 	writeHex(eid, 8, out);
+	Local<Object> obj = Object::New(isolate);
+	obj->Set(String::NewFromUtf8(isolate, "eid"),String::NewFromUtf8(isolate, out));
+	args.GetReturnValue().Set(obj);
 	return;
 }
 
