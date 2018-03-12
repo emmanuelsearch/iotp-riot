@@ -18,10 +18,10 @@ USEMODULE += shell_commands
 USEMODULE += ps
 
 USEMODULE += vfs
-USEMODULE += mtd
+#USEMODULE += mtd
 
-USEMODULE += littlefs
-USEMODULE += constfs
+#USEMODULE += littlefs
+#USEMODULE += constfs
 
 ifneq (,$(filter littlefs, $(USEMODULE)))
   CFLAGS += -DVFS_FILE_BUFFER_SIZE=52 -DVFS_DIR_BUFFER_SIZE=44
