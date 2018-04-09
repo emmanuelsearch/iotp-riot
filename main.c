@@ -15,6 +15,10 @@
 #include "periph/flashpage.h"
 
 char stack[THREAD_STACKSIZE_MAIN];
+int IK_SIZE=32;
+int TS_SIZE=6;
+char ik[32 + 1];
+char ts_str[6 + 1];
 
 static void read_mem(void *addr, size_t len, char* output)
 {
@@ -26,6 +30,45 @@ static void read_mem(void *addr, size_t len, char* output)
       pos++;
     }
 }
+
+int read_ik(int argc, char **argv) {
+    if(argc > 1) {
+      void *addr;
+      int page;
+      addr = flashpage_addr(atoi(argv[1]));
+      uint8_t page_mem[FLASHPAGE_SIZE];
+      page = flashpage_page(addr);
+
+      flashpage_read(page, page_mem);
+     // printf("Read flash page %i into local page buffer\n", page);
+     // puts("Local page buffer:");
+      ik[IK_SIZE] = '\0';
+      read_mem(page_mem, IK_SIZE, ik);
+      printf("%s\n", ik);
+    }
+    return 0;
+}
+
+int read_ts(int argc, char **argv) {
+    if(argc > 1) {
+      void *addr;
+      int page;
+      addr = flashpage_addr(atoi(argv[1]));
+      uint8_t page_mem[FLASHPAGE_SIZE];
+      page = flashpage_page(addr);
+
+      flashpage_read(page, page_mem);
+     // printf("Read flash page %i into local page buffer\n", page);
+     // puts("Local page buffer:");
+
+      ts_str[TS_SIZE] = '\0';
+      read_mem(page_mem, TS_SIZE, ts_str);
+      printf("%s\n", ts_str);
+    }
+    return 0;
+}
+
+
 
 int read_internal(int argc, char **argv) {
     if(argc > 2) {
@@ -75,14 +118,13 @@ int write_internal(int argc, char **argv) {
 int genEID(int argc, char **argv)
 {
     (void) argc;
-    if(argc > 3) {
+    if(argc > 2) {
       char *ikString = argv[1];
-      int scaler = atoi(argv[2]);
-      int beacon_time_seconds = atoi(argv[3]);
-
+      int scaler = 0;
+      int beacon_time_seconds = atoi(argv[2]);
       uint8_t eid[16] = {0};
       generateEID(ikString, scaler, beacon_time_seconds, eid);
-      printf("Generated EID: ");
+      printf("Generated OTP: ");
       printHex(eid, 8);
     } else {
        printf("Too few arguments\n");
@@ -102,11 +144,39 @@ static int cmd_info(int argc, char **argv)
     return 0;
 }
 
+static int run_otp(int argc, char **argv)
+{
+   (void) argv;
+   (void) argc;
+    while(true) {
+        char *readik[2] = {"read_internal", "100"};
+        read_ik(2, readik);
+        char *readts[3] = {"read_internal", "101"};
+            read_ts(2, readts);
+        int ts = atoi(ts_str);
+            printf("identity key found: %s\n", ik);
+            printf("counter found: %d\n", ts);
+            char buffer[16 + 1];
+        buffer[16] = '\0';
+            sprintf(buffer, "%d", ts);
+            char *gen[4] = {"genEID", ik, "0", buffer};
+            genEID(4, gen);
+            sprintf(buffer, "%d", ++ts);
+        char *write[3] = {"write_internal", buffer, "101"};
+            write_internal(3, write);
+            //printf("%d", xtimer_now());
+        xtimer_sleep(5);
+    }
+    return 0;
+}
+
+
 static const shell_command_t commands[] = {
         { "geneid", "Generates an EID", genEID },
         { "info", "Show information about pages", cmd_info },
         { "write_internal", "Write a string to internal flashpage", write_internal },
         { "read_internal", "Read internal flashpage", read_internal },
+	    { "run_otp", "Write a string to internal flashpage", run_otp },
         { NULL, NULL, NULL }
 };
 
