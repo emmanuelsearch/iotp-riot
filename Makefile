@@ -18,6 +18,7 @@ USEMODULE += shell_commands
 USEMODULE += ps
 
 USEMODULE += vfs
+USEMODULE += xtimer
 #USEMODULE += mtd
 
 #USEMODULE += littlefs

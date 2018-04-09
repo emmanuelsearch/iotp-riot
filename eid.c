@@ -21,6 +21,18 @@ int modulus(double a, double b) {
 	return a - ( result ) * b;
 }
 
+//int pow(int a, int b) {
+//   int i;
+//    if(b == 0) {
+//	return 1;
+//    }
+//    int res = a;
+//    for(i = 1; i < b; i++) {
+//        res = res * a;
+//    }
+//    return res;
+//}
+
 void printHex(uint8_t *hex, int offset) {
 	for(int i = 0; i < AES_BLOCK_SIZE; ++i) {
 		if(offset > 0 && i >= offset) {

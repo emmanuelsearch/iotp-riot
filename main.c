@@ -10,53 +10,38 @@
 
 #include <string.h>
 #include "shell.h"
-
+#include <xtimer.h>
+#include <thread.h>
 #include "periph/flashpage.h"
 
-#define LINE_LEN (16)
+char stack[THREAD_STACKSIZE_MAIN];
 
-static void dumpchar(uint8_t mem)
-{
-    if (mem >= ' ' && mem <= '~') {
-        printf("  %c  ", mem);
-    }
-    else {
-        printf("  ?? ");
-    }
-}
-
-static void memdump(void *addr, size_t len)
+static void read_mem(void *addr, size_t len, char* output)
 {
     unsigned pos = 0;
     uint8_t *mem = (uint8_t *)addr;
 
-    while (pos < (unsigned)len) {
-        for (unsigned i = 0; i < LINE_LEN; i++) {
-            printf("0x%02x ", mem[pos + i]);
-        }
-        puts("");
-        for (unsigned i = 0; i < LINE_LEN; i++) {
-            dumpchar(mem[pos++]);
-        }
-        puts("");
+    for (unsigned i = 0; i < len; i++) {
+      output[pos] = (char) mem[pos];
+      pos++;
     }
 }
 
-int read_internal(int argc, char **argv) {
-    if(argc > 1) {
-      uint8_t page_mem[FLASHPAGE_SIZE];
+char* read_internal(int address, int size, char* out) {
       void *addr;
       int page;
-      addr = flashpage_addr(atoi(argv[1]));
+      addr = flashpage_addr(address);
+      uint8_t page_mem[FLASHPAGE_SIZE];
       page = flashpage_page(addr);
 
       flashpage_read(page, page_mem);
       printf("Read flash page %i into local page buffer\n", page);
       puts("Local page buffer:");
-      memdump(page_mem, FLASHPAGE_SIZE);
-    }
-    return 0;
+      out[size] = '\0';
+      read_mem(page_mem, size, out);
+      printf("%s\n", out);
 
+    return 0;
 }
 
 int write_internal(int argc, char **argv) {
@@ -83,14 +68,13 @@ int write_internal(int argc, char **argv) {
     return 1;
 }
 
-int genEID(int argc, char **argv)
+static int genEID(int argc, char **argv)
 {
-    (void) argc;
+ //   printf("%d \n", pow(2, 4));
     if(argc > 3) {
       char *ikString = argv[1];
       int scaler = atoi(argv[2]);
       int beacon_time_seconds = atoi(argv[3]);
-
       uint8_t eid[16] = {0};
       generateEID(ikString, scaler, beacon_time_seconds, eid);
       printf("Generated EID: ");
@@ -113,15 +97,47 @@ static int cmd_info(int argc, char **argv)
     return 0;
 }
 
+static int run_otp(int argc, char **argv)
+//void *run_otp(void *argc)
+{
+   (void) argv;
+   (void) argc;
+    while(true) {
+        char ik[16 + 1];
+	read_internal(100, 16*2, ik);
+	char ts_str[6 + 1];
+        read_internal(101, 6, ts_str);
+	int ts = atoi(ts_str);
+        printf("identity key found: %s\n", ik);
+        printf("counter found: %d\n", ts);
+        char buffer[16];
+        sprintf(buffer, "%d", ts++);
+        char *gen[4] = {"genEID", ik, "0", buffer};
+        genEID(4, gen); 
+        sprintf(buffer, "%d", ts);
+	char *write[3] = {"write_internal", buffer, "101"};
+        write_internal(3, write);
+        //printf("%d", xtimer_now());
+	xtimer_sleep(5);
+    }
+    return 0;
+}
+
 static const shell_command_t commands[] = {
         { "geneid", "Generates an EID", genEID },
         { "info", "Show information about pages", cmd_info },
         { "write_internal", "Write a string to internal flashpage", write_internal },
-        { "read_internal", "Read internal flashpage", read_internal },
+        { "run_otp", "Write a string to internal flashpage", run_otp },
+//        { "read_internal", "Read internal flashpage", read_internal },
         { NULL, NULL, NULL }
 };
 
 int main (void) {
+    char *write_ik[3] = {"write_internal", "e2e12c2281cdf3d350a34de4d5f56613", "100"};
+    write_internal(3, write_ik);
+    char *write_ts[3] = {"write_internal", "100000", "101"};
+    write_internal(3, write_ts);
+//    kernel_pid_t pid = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST, run_otp, NULL, "otp_thread");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     cmd_info(0, NULL);
     shell_run(commands, line_buf, SHELL_DEFAULT_BUFSIZE);
