@@ -9,54 +9,43 @@
 #include "eid.h"
 
 #include <string.h>
+#include <xtimer.h>
 #include "shell.h"
 
 #include "periph/flashpage.h"
 
-#define LINE_LEN (16)
+char stack[THREAD_STACKSIZE_MAIN];
 
-static void dumpchar(uint8_t mem)
-{
-    if (mem >= ' ' && mem <= '~') {
-        printf("  %c  ", mem);
-    }
-    else {
-        printf("  ?? ");
-    }
-}
-
-static void memdump(void *addr, size_t len)
+static void read_mem(void *addr, size_t len, char* output)
 {
     unsigned pos = 0;
     uint8_t *mem = (uint8_t *)addr;
 
-    while (pos < (unsigned)len) {
-        for (unsigned i = 0; i < LINE_LEN; i++) {
-            printf("0x%02x ", mem[pos + i]);
-        }
-        puts("");
-        for (unsigned i = 0; i < LINE_LEN; i++) {
-            dumpchar(mem[pos++]);
-        }
-        puts("");
+    for (unsigned i = 0; i < len; i++) {
+      output[pos] = (char) mem[pos];
+      pos++;
     }
 }
 
 int read_internal(int argc, char **argv) {
-    if(argc > 1) {
-      uint8_t page_mem[FLASHPAGE_SIZE];
+    if(argc > 2) {
       void *addr;
       int page;
       addr = flashpage_addr(atoi(argv[1]));
+      uint8_t page_mem[FLASHPAGE_SIZE];
       page = flashpage_page(addr);
 
       flashpage_read(page, page_mem);
-      printf("Read flash page %i into local page buffer\n", page);
-      puts("Local page buffer:");
-      memdump(page_mem, FLASHPAGE_SIZE);
+     // printf("Read flash page %i into local page buffer\n", page);
+     // puts("Local page buffer:");
+
+      int size = atoi(argv[2]);
+      char out[size + 1];
+      out[size] = '\0';
+      read_mem(page_mem, size, out);
+      printf("%s\n", out);
     }
     return 0;
-
 }
 
 int write_internal(int argc, char **argv) {
