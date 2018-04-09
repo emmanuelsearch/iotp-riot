@@ -25,7 +25,7 @@ For example:
 
     geneid e2e12c2281cdf3d350a34de4d5f56613 100000
     
-The above example creates outputs
+The above example outputs
 
     INFO # Init Key Data: e2 e1 2c 22 81 cd f3 d3 50 a3 4d e4 d5 f5 66 13 
     INFO # Temporary Key Data: 00 00 00 00 00 00 00 00 00 00 00 ff 00 00 00 01 
@@ -45,7 +45,7 @@ For example:
 
     write_internal e2e12c2281cdf3d350a34de4d5f56613 100
 
-The above example creates outputs
+The above example outputs
 
     INFO # write_internal e2e12c2281cdf3d350a34de4d5f56613 100
     INFO # successfully erased page 100 (addr 0x6400)
@@ -61,6 +61,6 @@ For example:
 
     write_internal 100 32
     
-The above example creates outputs
+The above example outputs
 
     INFO # e2e12c2281cdf3d350a34de4d5f56613
