@@ -17,9 +17,9 @@ Flash the board
 
 Create an OTP with the following pattern
 
-    geneid IK TIMESTAMP
+    geneid IK COUNTER
 
-IK = initialization key, TIMESTAMP = the timestamp for which the OTP should be generated.
+IK = identity key, COUNTER = the counter for which the OTP should be generated.
 
 For example:
 
