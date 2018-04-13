@@ -146,26 +146,26 @@ static int cmd_info(int argc, char **argv)
 
 static int run_otp(int argc, char **argv)
 {
-   (void) argv;
-   (void) argc;
+   if(argc > 2) {
+    char buffer[16 + 1] = {0};
     while(true) {
-        char *readik[2] = {"read_internal", "100"};
+        char *readik[2] = {"read_internal", argv[1]};
         read_ik(2, readik);
-        char *readts[3] = {"read_internal", "101"};
-            read_ts(2, readts);
+        char *readts[3] = {"read_internal", argv[2]};
+        read_ts(2, readts);
         int ts = atoi(ts_str);
-            printf("identity key found: %s\n", ik);
-            printf("counter found: %d\n", ts);
-            char buffer[16 + 1];
+        printf("identity key found: %s\n", ik);
+        printf("counter found: %d\n", ts);
         buffer[16] = '\0';
-            sprintf(buffer, "%d", ts);
-            char *gen[4] = {"genEID", ik, "0", buffer};
-            genEID(4, gen);
-            sprintf(buffer, "%d", ++ts);
-        char *write[3] = {"write_internal", buffer, "101"};
-            write_internal(3, write);
-            //printf("%d", xtimer_now());
+        sprintf(buffer, "%d", ts++);
+        char *gen[3] = {"genEID", ik, buffer};
+        genEID(3, gen);
+        sprintf(buffer, "%d", ts);
+        char *write[3] = {"write_internal", buffer, argv[2]};
+        write_internal(3, write);
+        
         xtimer_sleep(5);
+    }
     }
     return 0;
 }
