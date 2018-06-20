@@ -248,7 +248,7 @@ int main(void)
 
     #ifdef BLE
     thread_create(blestack, sizeof(blestack),
-                    THREAD_PRIORITY_MAIN - 1,
+                    THREAD_PRIORITY_MAIN - 2,
                     THREAD_CREATE_STACKTEST,
                     blethread_handler,
                     NULL, "ble stack thread");

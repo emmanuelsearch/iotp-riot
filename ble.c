@@ -46,15 +46,15 @@ void *notificationthread_handler(void *arg)
     int counter = 0;
     
     while(1) {
-        if (counter == 5) {
+        if (counter == 0) {
             puts("Issuing value notification: Temperature");
             rc = ble_gatts_find_chr(&gatt_svr_chr_temp_serv_uuid.u, &gatt_svr_chr_temp_data_uuid.u, NULL, &chr_val_handle);
             }
-        if (counter == 5) {
+        if (counter == 1) {
             puts("Issuing value notification: Humidity");
             rc = ble_gatts_find_chr(&gatt_svr_chr_hum_serv_uuid.u, &gatt_svr_chr_hum_data_uuid.u, NULL, &chr_val_handle);
             }
-        if (counter == 5) {
+        if (counter == 2) {
             puts("Issuing value notification: Pressure");
             ble_gatts_find_chr(&gatt_svr_chr_press_serv_uuid.u, &gatt_svr_chr_press_data_uuid.u, NULL, &chr_val_handle);
             }

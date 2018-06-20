@@ -35,6 +35,14 @@ gatt_svr_chr_access_temperature_data(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg);
 
 static int
+gatt_svr_chr_access_hum_data(uint16_t conn_handle, uint16_t attr_handle,
+                               struct ble_gatt_access_ctxt *ctxt, void *arg);
+
+static int
+gatt_svr_chr_access_press_data(uint16_t conn_handle, uint16_t attr_handle,
+                               struct ble_gatt_access_ctxt *ctxt, void *arg);
+
+static int
 gatt_svr_chr_access_temperature_conf(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg);
                                
@@ -109,7 +117,7 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
             /* Characteristic: Humidity data */
             .uuid = (ble_uuid_t*)&gatt_svr_chr_hum_data_uuid.u,
             /* TO DO CALL BACK */
-            .access_cb = gatt_svr_chr_access_temperature_data,
+            .access_cb = gatt_svr_chr_access_hum_data,
          /*   .val_handle = &hrs_hrm_handle, */
             .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
         }, {
@@ -136,7 +144,7 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
             /* Characteristic: Pressure data */
             .uuid = (ble_uuid_t*)&gatt_svr_chr_press_data_uuid.u,
             /* TO DO CALL BACK */
-            .access_cb = gatt_svr_chr_access_temperature_data,
+            .access_cb = gatt_svr_chr_access_press_data,
          /*   .val_handle = &hrs_hrm_handle, */
             .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
         }, {
@@ -209,10 +217,11 @@ static int
 gatt_svr_chr_access_temperature_data(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
-    /* DUMMY value */
-    static uint32_t dummy_temperature = 0x0AA00AA0;
-    dummy_temperature = dummy_temperature + variation;
-    variation = (dummy_temperature + 10)%50;
+    /* DUMMY temperature value: 54 67 08 8b */
+    static uint32_t dummy_temperature = 0x4867088b;
+    /* DUMMY variation */
+    /* dummy_temperature = dummy_temperature + variation;
+    variation = (dummy_temperature + 10)%9; */
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
@@ -226,13 +235,60 @@ gatt_svr_chr_access_temperature_data(uint16_t conn_handle, uint16_t attr_handle,
 }
 
 static int
+gatt_svr_chr_access_hum_data(uint16_t conn_handle, uint16_t attr_handle,
+                               struct ble_gatt_access_ctxt *ctxt, void *arg)
+{
+    /* DUMMY humidity value: 0x740a480d */
+    static uint32_t dummy_humidity = 0x640a480d;
+    /* dummy_temperature = dummy_temperature + variation;
+    variation = (dummy_temperature + 10)%50; */
+    (void)conn_handle;
+    (void)attr_handle;
+    (void)arg;
+    /* uint16_t uuid; */
+    int rc = os_mbuf_append(ctxt->om, &dummy_humidity, sizeof(dummy_humidity));
+
+    return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
+
+    assert(0);
+    return BLE_ATT_ERR_UNLIKELY;
+}
+
+static int
+gatt_svr_chr_access_press_data(uint16_t conn_handle, uint16_t attr_handle,
+                               struct ble_gatt_access_ctxt *ctxt, void *arg)
+{
+    /* DUMMY pressure value: 0x780a00fa8a01 */
+    static uint8_t dummy_pressure[6];
+    dummy_pressure[0] = 0x79;
+    dummy_pressure[1] = 0x0a;
+    dummy_pressure[2] = 0x00;
+    dummy_pressure[3] = 0xf7;
+    dummy_pressure[4] = 0x8a;
+    dummy_pressure[5] = 0x01;
+    /* dummy_temperature = dummy_temperature + variation;
+    variation = (dummy_temperature + 10)%50; */
+    (void)conn_handle;
+    (void)attr_handle;
+    (void)arg;
+    /* uint16_t uuid; */
+    int rc = os_mbuf_append(ctxt->om, &dummy_pressure, sizeof(dummy_pressure));
+
+    return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
+
+    assert(0);
+    return BLE_ATT_ERR_UNLIKELY;
+}
+
+
+static int
 gatt_svr_chr_access_optical_data(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
-    /* DUMMY value */
-    static uint16_t dummy_optical_value = 0x0AA0;
-    dummy_optical_value = dummy_optical_value + variation;
-    variation = (dummy_optical_value + 10)%50;
+    /* DUMMY optical value: 3c 4c */
+    static uint16_t dummy_optical_value = 0x284c;
+    /* dummy_optical_value = dummy_optical_value + variation;
+    variation = (dummy_optical_value + 10)%50; */
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
@@ -245,12 +301,11 @@ gatt_svr_chr_access_optical_data(uint16_t conn_handle, uint16_t attr_handle,
     return BLE_ATT_ERR_UNLIKELY;
 }
 
-
 static int
 gatt_svr_chr_access_temperature_conf(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
-    /* DUMMY to do */
+    /* DUMMY value */
     static uint8_t dummy_value = 0x01;
     (void)conn_handle;
     (void)attr_handle;
