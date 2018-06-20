@@ -3,7 +3,7 @@
  *
  *  Created on: June, 18 2018
  *      Authors: Eduard Brehm
- *               Emmanuel Baccelli
+ *               Emmanuel Baccelli (Copyright (C) 2018 Inria)
  */
 
 #include <stdio.h>
@@ -131,8 +131,6 @@ int write_ik(int argc, char **argv) {
         return 1;
     }
     printf("got page: %u \n", page);
-    // flashpage_write(page, NULL); 
-    // printf("Erased page: %u \n", page);
     memcpy(&page_mem[0], argv[2], data_len);
     page_mem[data_len]= 0x00;
     page_mem[data_len+1]= 0x00;
@@ -208,7 +206,7 @@ static int run_otp(int argc, char **argv)
         flashpage_write(page, NULL);
         int res = write_counter(counter, page);
 
-        xtimer_sleep(5);
+        xtimer_sleep(10);
     }
     }
     else {

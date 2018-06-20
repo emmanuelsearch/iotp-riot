@@ -29,7 +29,6 @@
 char notificationstack[THREAD_STACKSIZE_MAIN];
 int static_sensor_value;
 
-/* static const char device_name[] = "NimBLE on RIOT"; */
 static const char device_name[] = "SensorTag RIOT";
 static uint8_t own_addr_type;
 
@@ -41,35 +40,39 @@ void *notificationthread_handler(void *arg)
     (void)arg;
     uint16_t chr_val_handle;
     int rc=0;
-    /* static_sensor_value = 20; */
     xtimer_sleep(1);
     int counter = 0;
     
     while(1) {
-        if (counter == 0) {
-            puts("Issuing value notification: Temperature");
-            rc = ble_gatts_find_chr(&gatt_svr_chr_temp_serv_uuid.u, &gatt_svr_chr_temp_data_uuid.u, NULL, &chr_val_handle);
-            }
-        if (counter == 1) {
-            puts("Issuing value notification: Humidity");
-            rc = ble_gatts_find_chr(&gatt_svr_chr_hum_serv_uuid.u, &gatt_svr_chr_hum_data_uuid.u, NULL, &chr_val_handle);
-            }
-        if (counter == 2) {
-            puts("Issuing value notification: Pressure");
-            ble_gatts_find_chr(&gatt_svr_chr_press_serv_uuid.u, &gatt_svr_chr_press_data_uuid.u, NULL, &chr_val_handle);
-            }
-        if (counter == 3) {
-            puts("Issuing value notification: Optical");
-            rc = ble_gatts_find_chr(&gatt_svr_chr_opt_serv_uuid.u, &gatt_svr_chr_opt_data_uuid.u, NULL, &chr_val_handle);
-            }
-    if(rc == 0){
+        rc = ble_gatts_find_chr(&gatt_svr_chr_temp_serv_uuid.u, &gatt_svr_chr_temp_data_uuid.u, NULL, &chr_val_handle);
+        if(rc == 0){
         ble_gatts_chr_updated(chr_val_handle);
         }
-        else puts("Error: finding service handle");
-    
-    counter++;
-    counter = counter%4;
-    xtimer_sleep(5);
+        else puts("Error: finding temperature service handle");
+        xtimer_sleep(2);
+        
+        rc = ble_gatts_find_chr(&gatt_svr_chr_hum_serv_uuid.u, &gatt_svr_chr_hum_data_uuid.u, NULL, &chr_val_handle);
+        if(rc == 0){
+        ble_gatts_chr_updated(chr_val_handle);
+        }
+        else puts("Error: finding humidity service handle");
+        xtimer_sleep(2);
+        
+        rc = ble_gatts_find_chr(&gatt_svr_chr_press_serv_uuid.u, &gatt_svr_chr_press_data_uuid.u, NULL, &chr_val_handle);
+        if(rc == 0){
+        ble_gatts_chr_updated(chr_val_handle);
+        }
+        else puts("Error: finding pressure service handle");
+        xtimer_sleep(2);
+        
+        rc = ble_gatts_find_chr(&gatt_svr_chr_opt_serv_uuid.u, &gatt_svr_chr_opt_data_uuid.u, NULL, &chr_val_handle);
+        if(rc == 0){
+        ble_gatts_chr_updated(chr_val_handle);
+        }
+        else puts("Error: finding optical service handle");
+        
+        xtimer_sleep(10);
+
     }
 
     return NULL;
@@ -148,7 +151,7 @@ static void app_ble_sync_cb(void)
 
 int ble_sensor_init(void)
 {
-    puts("NimBLE GATT Server Example");
+    puts("OTP over BLE AGILE with RIOT");
 
     /* initialize NimBLE's controller */
     nimble_riot_controller_init();
@@ -163,7 +166,7 @@ int ble_sensor_init(void)
     ble_svc_gatt_init();
     
     /* add gatt services */
-    puts("Starting services ");
+    puts("Starting BLE sensor notifications...");
     int rc = gatt_svr_init();
     assert(rc == 0);
 

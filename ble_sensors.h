@@ -14,7 +14,7 @@
 #define GATT_MANUFACTURER_NAME_UUID             0x2A29
 #define GATT_MODEL_NUMBER_UUID                  0x2A24
 
-/* TI defined UUIDs */
+/* UUIDs defined by Texas Instruments */
 
 #define TEMPERATURE_SERV_UUID 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB0, \
 0x00, 0x40, 0x51, 0x04, 0x00, 0xAA, 0x00, 0xF0
@@ -129,8 +129,6 @@ static const ble_uuid128_t gatt_svr_chr_io_data_uuid =
 
 static const ble_uuid128_t gatt_svr_chr_io_conf_uuid =
         BLE_UUID128_INIT(IO_CONF_UUID);
-
-/* extern uint16_t hrs_hrm_handle; */
 
 int gatt_svr_init(void);
 

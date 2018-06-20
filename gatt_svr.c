@@ -116,7 +116,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         .characteristics = (struct ble_gatt_chr_def[]) { {
             /* Characteristic: Humidity data */
             .uuid = (ble_uuid_t*)&gatt_svr_chr_hum_data_uuid.u,
-            /* TO DO CALL BACK */
             .access_cb = gatt_svr_chr_access_hum_data,
          /*   .val_handle = &hrs_hrm_handle, */
             .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
@@ -143,7 +142,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         .characteristics = (struct ble_gatt_chr_def[]) { {
             /* Characteristic: Pressure data */
             .uuid = (ble_uuid_t*)&gatt_svr_chr_press_data_uuid.u,
-            /* TO DO CALL BACK */
             .access_cb = gatt_svr_chr_access_press_data,
          /*   .val_handle = &hrs_hrm_handle, */
             .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
@@ -170,7 +168,6 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
         .characteristics = (struct ble_gatt_chr_def[]) { {
             /* Characteristic: Optical data */
             .uuid = (ble_uuid_t*)&gatt_svr_chr_opt_data_uuid.u,
-            /* TO DO CALL BACK */
             .access_cb = gatt_svr_chr_access_optical_data,
          /*   .val_handle = &hrs_hrm_handle, */
             .flags = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
@@ -225,7 +222,6 @@ gatt_svr_chr_access_temperature_data(uint16_t conn_handle, uint16_t attr_handle,
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    /* uint16_t uuid; */
     int rc = os_mbuf_append(ctxt->om, &dummy_temperature, sizeof(dummy_temperature));
 
     return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -240,12 +236,10 @@ gatt_svr_chr_access_hum_data(uint16_t conn_handle, uint16_t attr_handle,
 {
     /* DUMMY humidity value: 0x740a480d */
     static uint32_t dummy_humidity = 0x640a480d;
-    /* dummy_temperature = dummy_temperature + variation;
-    variation = (dummy_temperature + 10)%50; */
+
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    /* uint16_t uuid; */
     int rc = os_mbuf_append(ctxt->om, &dummy_humidity, sizeof(dummy_humidity));
 
     return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -266,12 +260,11 @@ gatt_svr_chr_access_press_data(uint16_t conn_handle, uint16_t attr_handle,
     dummy_pressure[3] = 0xf7;
     dummy_pressure[4] = 0x8a;
     dummy_pressure[5] = 0x01;
-    /* dummy_temperature = dummy_temperature + variation;
-    variation = (dummy_temperature + 10)%50; */
+
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    /* uint16_t uuid; */
+
     int rc = os_mbuf_append(ctxt->om, &dummy_pressure, sizeof(dummy_pressure));
 
     return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -287,12 +280,11 @@ gatt_svr_chr_access_optical_data(uint16_t conn_handle, uint16_t attr_handle,
 {
     /* DUMMY optical value: 3c 4c */
     static uint16_t dummy_optical_value = 0x284c;
-    /* dummy_optical_value = dummy_optical_value + variation;
-    variation = (dummy_optical_value + 10)%50; */
+
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    /* uint16_t uuid; */
+
     int rc = os_mbuf_append(ctxt->om, &dummy_optical_value, sizeof(dummy_optical_value));
 
     return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -310,7 +302,7 @@ gatt_svr_chr_access_temperature_conf(uint16_t conn_handle, uint16_t attr_handle,
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    /* uint16_t uuid; */
+
     int rc = os_mbuf_append(ctxt->om, &dummy_value, sizeof(dummy_value));
 
     return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -323,12 +315,12 @@ static int
 gatt_svr_chr_access_temperature_peri(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
-    /* DUMMY to do */
+    /* DUMMY value */
     static uint8_t dummy_value = 0x02;
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    /* uint16_t uuid; */
+
     int rc = os_mbuf_append(ctxt->om, &dummy_value, sizeof(dummy_value));
 
     return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -341,12 +333,12 @@ static int
 gatt_svr_chr_access_io_data(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
-    /* DUMMY*/
+    /* DUMMY value */
     static uint8_t dummy_value = 0x7F;
     (void)conn_handle;
     (void)attr_handle;
     (void)arg;
-    /* uint16_t uuid; */
+
     int rc = os_mbuf_append(ctxt->om, &dummy_value, sizeof(dummy_value));
 
     return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
@@ -360,7 +352,7 @@ static int
 gatt_svr_chr_access_io_conf(uint16_t conn_handle, uint16_t attr_handle,
                                struct ble_gatt_access_ctxt *ctxt, void *arg)
 {
-    /* DUMMY to do */
+    /* DUMMY value */
     static uint8_t dummy_value = 0x00;
     (void)conn_handle;
     (void)attr_handle;
@@ -400,40 +392,6 @@ gatt_svr_chr_access_device_info(uint16_t conn_handle, uint16_t attr_handle,
     return BLE_ATT_ERR_UNLIKELY;
 }
 
-/* 
-void
-gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg)
-{
-    char buf[BLE_UUID_STR_LEN];
-
-    switch (ctxt->op) {
-    case BLE_GATT_REGISTER_OP_SVC:
-       BLEHR_LOG(DEBUG, "registered service %s with handle=%d\n", 
-                    ble_uuid_to_str(ctxt->svc.svc_def->uuid, buf),
-                    ctxt->svc.handle);
-        break;
-
-    case BLE_GATT_REGISTER_OP_CHR:
-        BLEHR_LOG(DEBUG, "registering characteristic %s with "
-                           "def_handle=%d val_handle=%d\n",
-                    ble_uuid_to_str(ctxt->chr.chr_def->uuid, buf),
-                    ctxt->chr.def_handle,
-                    ctxt->chr.val_handle);
-        break;
-
-    case BLE_GATT_REGISTER_OP_DSC:
-        BLEHR_LOG(DEBUG, "registering descriptor %s with handle=%d\n",
-                    ble_uuid_to_str(ctxt->dsc.dsc_def->uuid, buf),
-                    ctxt->dsc.handle);
-        break;
-
-    default:
-        assert(0);
-        break;
-    }
-}
-*/
-
 int gatt_svr_init(void)
 {
     int rc;
@@ -450,40 +408,3 @@ int gatt_svr_init(void)
 
     return 0;
 }
-
-
-/* 
-static int gatt_svr_chr_access_temperature(uint16_t conn_handle, uint16_t attr_handle,
-                             struct ble_gatt_access_ctxt *ctxt,
-                             void *arg) {
-    (void)conn_handle;
-    (void)attr_handle;
-    (void)arg;
-
-    const ble_uuid_t *uuid;
-    static uint8_t gatt_svr_temperature_static_val = 20;
-    int rc;
-
-    uuid = ctxt->chr->uuid;
-
-
-    if (ble_uuid_cmp(uuid, &gatt_svr_chr_temp_serv_uuid.u) == 0) {
-        switch (ctxt->op) {
-        case BLE_GATT_ACCESS_OP_READ_CHR:
-            rc = os_mbuf_append(ctxt->om, &gatt_svr_temperature_static_val,
-                                sizeof gatt_svr_temperature_static_val);
-            return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
-
-        default:
-            assert(0);
-            return BLE_ATT_ERR_UNLIKELY;
-        }
-    }
-
-
-    assert(0);
-    return BLE_ATT_ERR_UNLIKELY;
-
-}
-
-*/
