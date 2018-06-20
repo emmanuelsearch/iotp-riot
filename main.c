@@ -13,31 +13,24 @@
 #include <xtimer.h>
 #include "shell.h"
 #include "periph/flashpage.h"
+#include "ble_sensors.h"
 
 #define LINE_LEN            (16)
+#define BLE
 
 int IK_SIZE=32;
 int TS_SIZE=8;
 char dummy_data[1]="0";
+char blestack[THREAD_STACKSIZE_MAIN];
+
+#ifdef BLE
+
+#endif
 
 /**
  * @brief   Allocate space for 1 flash page in RAM
  */
 static uint8_t page_mem[FLASHPAGE_SIZE] = {0};
-
-#ifdef MODULE_PERIPH_FLASHPAGE_RAW
-/*
- * @brief   Allocate an aligned buffer for raw writings
- */
-static char raw_buf[64] __attribute__ ((aligned (FLASHPAGE_RAW_ALIGNMENT)));
-
-static uint32_t getaddr(const char *str)
-{
-    uint32_t addr = strtol(str, NULL, 16);
-
-    return addr;
-}
-#endif
 
 
 static void dumpchar(uint8_t mem)
@@ -137,14 +130,16 @@ int write_ik(int argc, char **argv) {
     if ((page < 0) ) {
         return 1;
     }
-
-    flashpage_write(page, NULL);
+    printf("got page: %u \n", page);
+    // flashpage_write(page, NULL); 
+    // printf("Erased page: %u \n", page);
     memcpy(&page_mem[0], argv[2], data_len);
     page_mem[data_len]= 0x00;
     page_mem[data_len+1]= 0x00;
     for (unsigned i = data_len+2; i < FLASHPAGE_SIZE; i++) {
         memcpy(&page_mem[i], dummy_data, 1);
         }
+    puts("wrote page_mem");
     if (flashpage_write_and_verify(page, page_mem) != FLASHPAGE_OK) {
         printf("error: writing identify key in page %i failed\n", page);
    	return 1;
@@ -180,50 +175,6 @@ static int cmd_info(int argc, char **argv)
     printf("Page size:\t\t%i\n", (int)FLASHPAGE_SIZE);
     printf("Number of pages:\t%i\n", (int)FLASHPAGE_NUMOF);
 
-    return 0;
-}
-
-
-#ifdef MODULE_PERIPH_FLASHPAGE_RAW
-static int cmd_write_raw(int argc, char **argv)
-{
-    uint32_t addr;
-
-    if (argc < 3) {
-        printf("usage: %s <addr> <data>\n", argv[0]);
-        return 1;
-    }
-
-    addr = getaddr(argv[1]);
-
-    /* try to align */
-    memcpy(raw_buf, argv[2], strlen(argv[2]));
-
-    flashpage_write_raw((void*)addr, raw_buf, strlen(raw_buf));
-
-    printf("wrote local data to flash address %#lx of len %u\n",
-           addr, strlen(raw_buf));
-    return 0;
-}
-#endif
-
-static int cmd_erase(int argc, char **argv)
-{
-    int page;
-
-    if (argc < 2) {
-        printf("usage: %s <page>\n", argv[0]);
-        return 1;
-    }
-
-    page = getpage(argv[1]);
-    if (page < 0) {
-        return 1;
-    }
-    flashpage_write(page, NULL);
-
-    printf("successfully erased page %i (addr %p)\n",
-           page, flashpage_addr(page));
     return 0;
 }
 
@@ -273,19 +224,35 @@ static const shell_command_t shell_commands[] = {
     { "read_ik", "Read key from the given page", read_ik },
     { "geneid", "Generates an EID", genEID },
     { "run_otp", "Runs periodic periodic token generation", run_otp },
-#ifdef MODULE_PERIPH_FLASHPAGE_RAW
-    { "write_raw", "Write (ASCII, max 64B) data to the given address", cmd_write_raw },
-#endif
-    { "erase", "Erase the given page buffer", cmd_erase },
     { NULL, NULL, NULL }
 };
 
+#ifdef BLE
+void *blethread_handler(void *arg)
+{
+    /* remove warning unused parameter arg */
+    (void)arg;
+    int rc = ble_sensor_init();
+    rc++;
+    return NULL;
+}
+#endif
+
+
 int main(void)
 {
-    puts("ROM flash read write test\n");
+    puts("OTP application for AGILE with RIOT\n");
     puts("Please refer to the README.md for further information\n");
 
     cmd_info(0, NULL);
+
+    #ifdef BLE
+    thread_create(blestack, sizeof(blestack),
+                    THREAD_PRIORITY_MAIN - 1,
+                    THREAD_CREATE_STACKTEST,
+                    blethread_handler,
+                    NULL, "ble stack thread");
+    #endif
 
     /* run the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];

@@ -1,8 +1,8 @@
-APPLICATION = eid
-RIOT_DIR = RIOT
+APPLICATION = eid_ble
+RIOT_DIR = $(CURDIR)/RIOT
 #BOARD ?= native
-BOARD ?=samr21-xpro
-RIOTBASE ?= $(CURDIR)/$(RIOT_DIR)/
+BOARD ?= nrf52840dk
+RIOTBASE ?= $(RIOT_DIR)
 QUIET ?= 1
 
 CFLAGS += -DDEVELHELP
@@ -11,25 +11,14 @@ CFLAGS += -DCRYPTO_AES
 CFLAGS += -Wno-unused-variable
 
 FEATURES_REQUIRED += periph_flashpage
-FEATURES_OPTIONAL += periph_flashpage_raw
+#FEATURES_OPTIONAL += periph_flashpage_raw
 
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+USEPKG += nimble
 
-USEMODULE += vfs
 USEMODULE += xtimer
-#USEMODULE += mtd
-
-#USEMODULE += littlefs
-#USEMODULE += constfs
-
-ifneq (,$(filter littlefs, $(USEMODULE)))
-  CFLAGS += -DVFS_FILE_BUFFER_SIZE=52 -DVFS_DIR_BUFFER_SIZE=44
-else ifneq (,$(filter spiffs, $(USEMODULE)))
-  SPIFFS_NB_FD ?= 8
-  CFLAGS += '-DSPIFFS_FS_FD_SPACE_SIZE=(32 * $(SPIFFS_NB_FD))'
-endif
 
 include $(RIOTBASE)/Makefile.include
 
